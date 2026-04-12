@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">PokeDraw</string>
-    <string name="draw_button">Draw Pokémon</string>
-    <string name="draws_remaining">Draws remaining today: %d</string>
-    <string name="no_draws_left">No draws left today!</string>
-    <string name="guesses_remaining">Guesses remaining: %d</string>
-    <string name="no_guesses_left">No guesses left today!</string>
-</resources>
