@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorSurface">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome to PokeDraw!"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorAccent"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="A Pokemon card collecting game"
+            android:textSize="13sp"
+            android:textColor="@color/colorTextSecondary"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Drawing -->
+        <androidx.cardview.widget.CardView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="@color/colorCard"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="2dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Drawing" android:textSize="15sp" android:textStyle="bold" android:textColor="@color/colorText" android:layout_marginBottom="8dp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/colorTextSecondary" android:textSize="13sp" android:lineSpacingMultiplier="1.4" android:text="- You get 3 free draws every day, resets at midnight" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/colorTextSecondary" android:textSize="13sp" android:lineSpacingMultiplier="1.4" android:text="- Each draw gives you 10 Pokemon at once" android:layout_marginTop="4dp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/colorTextSecondary" android:textSize="13sp" android:lineSpacingMultiplier="1.4" android:text="- Hold the Draw button to draw faster, or enable Auto Draw" android:layout_marginTop="4dp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/colorTextSecondary" android:textSize="13sp" android:lineSpacingMultiplier="1.4" android:text="- Use redeem codes to get extra draws" android:layout_marginTop="4dp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Rarity -->
+        <androidx.cardview.widget.CardView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="@color/colorCard"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="2dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rarity Tiers" android:textSize="15sp" android:textStyle="bold" android:textColor="@color/colorText" android:layout_marginBottom="8dp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/rarityCommon"   android:textSize="13sp" android:lineSpacingMultiplier="1.4" android:text="- Common (74.5%) — Base form Pokemon" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/rarityRare"     android:textSize="13sp" android:lineSpacingMultiplier="1.4" android:text="- Rare (20%) — Middle stage of 3-stage chains" android:layout_marginTop="4dp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/rarityMythical" android:textSize="13sp" android:lineSpacingMultiplier="1.4" android:text="- Epic (5%) — Final evolutions and standalone Pokemon" android:layout_marginTop="4dp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/rarityLegendary" android:textSize="13sp" android:lineSpacingMultiplier="1.4" android:text="- Legendary (0.5%) — Legendary and Mythical Pokemon only" android:layout_marginTop="4dp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Evolution -->
+        <androidx.cardview.widget.CardView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="@color/colorCard"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="2dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Evolution" android:textSize="15sp" android:textStyle="bold" android:textColor="@color/colorText" android:layout_marginBottom="8dp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/colorTextSecondary" android:textSize="13sp" android:lineSpacingMultiplier="1.4" android:text="- Drawing duplicates or higher forms earns EXP on your card" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/colorTextSecondary" android:textSize="13sp" android:lineSpacingMultiplier="1.4" android:text="- Reach 5 EXP to auto-evolve to Stage 2, 15 EXP for Stage 3" android:layout_marginTop="4dp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/colorTextSecondary" android:textSize="13sp" android:lineSpacingMultiplier="1.4" android:text="- Drawing a higher evolution counts as more EXP" android:layout_marginTop="4dp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/colorTextSecondary" android:textSize="13sp" android:lineSpacingMultiplier="1.4" android:text="- Max stage plus extra EXP unlocks Shiny, Holo, and Gold card tiers" android:layout_marginTop="4dp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Collection and Pokedex -->
+        <androidx.cardview.widget.CardView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="@color/colorCard"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="2dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Collection and Pokedex" android:textSize="15sp" android:textStyle="bold" android:textColor="@color/colorText" android:layout_marginBottom="8dp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/colorTextSecondary" android:textSize="13sp" android:lineSpacingMultiplier="1.4" android:text="- Collection shows your cards with EXP progress and tier effects" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/colorTextSecondary" android:textSize="13sp" android:lineSpacingMultiplier="1.4" android:text="- Pokedex shows all 1025 Pokemon, dark until you draw them" android:layout_marginTop="4dp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/colorTextSecondary" android:textSize="13sp" android:lineSpacingMultiplier="1.4" android:text="- Tap an unlocked Pokedex card to see its stats and entry" android:layout_marginTop="4dp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Minigame -->
+        <androidx.cardview.widget.CardView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            app:cardBackgroundColor="@color/colorCard"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="2dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Minigame" android:textSize="15sp" android:textStyle="bold" android:textColor="@color/colorText" android:layout_marginBottom="8dp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/colorTextSecondary" android:textSize="13sp" android:lineSpacingMultiplier="1.4" android:text="- Play the Guess minigame to earn bonus draws" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/colorTextSecondary" android:textSize="13sp" android:lineSpacingMultiplier="1.4" android:text="- You get 5 guesses per day, also resets at midnight" android:layout_marginTop="4dp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/colorTextSecondary" android:textSize="13sp" android:lineSpacingMultiplier="1.4" android:text="- Correct guess adds 1 bonus draw instantly" android:layout_marginTop="4dp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/colorAccent" android:textSize="13sp" android:lineSpacingMultiplier="1.4" android:text="You can read this guide again anytime from Settings, How to Play" android:layout_marginTop="12dp" android:textStyle="bold" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#CC0000</color>
+    <color name="colorPrimaryDark">#990000</color>
+    <color name="colorAccent">#FFCB05</color>
+    <color name="colorBackground">#1A1A2E</color>
+    <color name="colorSurface">#16213E</color>
+    <color name="colorCard">#0F3460</color>
+    <color name="colorText">#FFFFFF</color>
+    <color name="colorTextSecondary">#AAAAAA</color>
+
+    <!-- Tier card backgrounds -->
+    <color name="tierCardShiny">#1B3A5A</color>
+    <color name="tierCardHolo">#2B1748</color>
+    <color name="tierCardGold">#3A2000</color>
+    <!-- Tier EXP bar colors -->
+    <color name="tierBarShiny">#C0C0C0</color>
+    <color name="tierBarHolo">#CF6FFF</color>
+    <color name="tierBarGold">#FFB300</color>
+
+    <color name="rarityCommon">#9E9E9E</color>
+    <color name="rarityRare">#2196F3</color>
+    <color name="rarityMythical">#9C27B0</color>
+    <color name="rarityLegendary">#FFC107</color>
+
+    <color name="typeNormal">#A8A878</color>
+    <color name="typeFire">#F08030</color>
+    <color name="typeWater">#6890F0</color>
+    <color name="typeGrass">#78C850</color>
+    <color name="typeElectric">#F8D030</color>
+    <color name="typeIce">#98D8D8</color>
+    <color name="typeFighting">#C03028</color>
+    <color name="typePoison">#A040A0</color>
+    <color name="typeGround">#E0C068</color>
+    <color name="typeFlying">#A890F0</color>
+    <color name="typePsychic">#F85888</color>
+    <color name="typeBug">#A8B820</color>
+    <color name="typeRock">#B8A038</color>
+    <color name="typeGhost">#705898</color>
+    <color name="typeDragon">#7038F8</color>
+    <color name="typeDark">#705848</color>
+    <color name="typeSteel">#B8B8D0</color>
+    <color name="typeFairy">#EE99AC</color>
+</resources>
