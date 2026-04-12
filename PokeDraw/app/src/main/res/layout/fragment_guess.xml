@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorBackground">
+
+    <!-- Top info -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Who's That Pokémon?"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorAccent"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/tvGuessesRemaining"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorText"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvGuessResetTimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorTextSecondary"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
+    <!-- Silhouette image — center of screen -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/ivSilhouette"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            android:scaleType="fitCenter" />
+
+        <ProgressBar
+            android:id="@+id/progressBarGuess"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+    <!-- Feedback text -->
+    <TextView
+        android:id="@+id/tvGuessFeedback"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:paddingBottom="8dp"
+        android:visibility="gone" />
+
+    <!-- Answer reveal (shown after guess) -->
+    <TextView
+        android:id="@+id/tvAnswerReveal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@color/colorTextSecondary"
+        android:textSize="13sp"
+        android:paddingBottom="8dp"
+        android:visibility="gone" />
+
+    <!-- Choice buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="12dp">
+
+        <Button
+            android:id="@+id/btnChoice1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:backgroundTint="@color/colorCard"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btnChoice2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:backgroundTint="@color/colorCard"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btnChoice3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:backgroundTint="@color/colorCard"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btnNextGuess"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Next Pokémon"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:backgroundTint="@color/colorPrimary"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</LinearLayout>
