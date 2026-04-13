@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DecodeFormat;
 import com.example.pokedraw.EvolutionChain;
 import com.example.pokedraw.ParticleView;
 import com.example.pokedraw.PokemonDetailActivity;
@@ -140,7 +141,11 @@ public class PokemonCardAdapter extends RecyclerView.Adapter<PokemonCardAdapter.
 
         // Sprite — always load normally, overlay handles the unowned visual
         int displayId = p.getDisplayId() > 0 ? p.getDisplayId() : p.getId();
-        Glide.with(h.itemView.getContext()).load(SPRITE_BASE + displayId + ".png").into(h.ivPokemon);
+        Glide.with(h.itemView.getContext())
+                .load(SPRITE_BASE + displayId + ".png")
+                .format(DecodeFormat.PREFER_RGB_565)
+                .dontAnimate()
+                .into(h.ivPokemon);
         h.ivPokemon.clearColorFilter();
         h.ivPokemon.setAlpha(1f);
 

@@ -21,16 +21,11 @@ import com.example.pokedraw.GameManager;
 import com.example.pokedraw.R;
 import com.example.pokedraw.RarityConfig;
 import com.example.pokedraw.adapter.PokemonCardAdapter;
-import com.example.pokedraw.api.PokemonResponse;
-import com.example.pokedraw.api.RetrofitClient;
 import com.example.pokedraw.model.OwnedPokemon;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class PokedexFragment extends Fragment {
 
@@ -54,9 +49,6 @@ public class PokedexFragment extends Fragment {
 
     private final List<OwnedPokemon> fullList    = new ArrayList<>();
     private final List<OwnedPokemon> displayList = new ArrayList<>();
-    private final HashMap<Integer, OwnedPokemon> apiCache = new HashMap<>();
-    private final Set<Integer> fetching = new HashSet<>();
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -132,48 +124,15 @@ public class PokedexFragment extends Fragment {
             OwnedPokemon slot = fullList.get(i);
             int id = slot.getId();
             if (collection.containsKey(id)) {
+                OwnedPokemon owned = collection.get(id);
                 slot.setCount(1);
-                slot.setDisplayId(id);
-                slot.setTier(0);
-                if (apiCache.containsKey(id)) {
-                    OwnedPokemon cached = apiCache.get(id);
-                    slot.setName(cached.getName());
-                    slot.setTypes(cached.getTypes());
-                    slot.setRarity(collection.get(id).getRarity());
-                } else if (!fetching.contains(id)) {
-                    fetching.add(id);
-                    final int slotId = id;
-                    final String rarity = collection.get(id).getRarity();
-                    RetrofitClient.getInstance().getApiService().getPokemon(slotId)
-                            .enqueue(new retrofit2.Callback<PokemonResponse>() {
-                                @Override
-                                public void onResponse(@NonNull retrofit2.Call<PokemonResponse> call,
-                                                       @NonNull retrofit2.Response<PokemonResponse> r) {
-                                    if (!isAdded() || !r.isSuccessful() || r.body() == null) return;
-                                    PokemonResponse data = r.body();
-                                    List<String> types = new ArrayList<>();
-                                    for (PokemonResponse.TypeSlot ts : data.getTypes())
-                                        types.add(ts.getType().getName());
-                                    OwnedPokemon clean = new OwnedPokemon();
-                                    clean.setId(slotId); clean.setName(data.getName());
-                                    clean.setTypes(types); clean.setRarity(rarity);
-                                    clean.setDisplayId(slotId); clean.setCount(1);
-                                    apiCache.put(slotId, clean);
-                                    for (OwnedPokemon s : fullList) {
-                                        if (s.getId() == slotId) {
-                                            s.setName(data.getName());
-                                            s.setTypes(types);
-                                            break;
-                                        }
-                                    }
-                                    if (isAdded())
-                                        requireActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
-                                }
-                                @Override
-                                public void onFailure(@NonNull retrofit2.Call<PokemonResponse> call,
-                                                      @NonNull Throwable t) { fetching.remove(slotId); }
-                            });
-                }
+                slot.setDisplayId(owned.getDisplayId() > 0 ? owned.getDisplayId() : id);
+                slot.setTier(owned.getTier());
+                slot.setName(owned.getName() != null && !owned.getName().isEmpty()
+                        ? owned.getName()
+                        : "Pokemon #" + String.format("%03d", id));
+                slot.setTypes(owned.getTypes() != null ? owned.getTypes() : new ArrayList<>());
+                slot.setRarity(owned.getRarity() != null ? owned.getRarity() : RarityConfig.COMMON);
             } else {
                 slot.setCount(0);
                 slot.setName("???");

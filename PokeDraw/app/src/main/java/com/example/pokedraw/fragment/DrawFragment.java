@@ -29,16 +29,11 @@ import com.example.pokedraw.GameManager;
 import com.example.pokedraw.R;
 import com.example.pokedraw.RarityConfig;
 import com.example.pokedraw.adapter.PokemonCardAdapter;
-import com.example.pokedraw.api.PokeApiService;
-import com.example.pokedraw.api.PokemonResponse;
-import com.example.pokedraw.api.RetrofitClient;
 import com.example.pokedraw.model.OwnedPokemon;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class DrawFragment extends Fragment {
 
@@ -250,47 +245,18 @@ public class DrawFragment extends Fragment {
         gameManager.recordDraw();
         updateDrawDisplay();
 
-        List<OwnedPokemon> drawnList = Collections.synchronizedList(new ArrayList<>());
-        AtomicInteger pending = new AtomicInteger(rolls.size());
-        PokeApiService api = RetrofitClient.getInstance().getApiService();
-
+        List<OwnedPokemon> drawnList = new ArrayList<>();
         for (int[] roll : rolls) {
             int pokemonId = roll[0];
             String rarity = GameManager.ordinalToRarity(roll[1]);
-
-            api.getPokemon(pokemonId).enqueue(new retrofit2.Callback<PokemonResponse>() {
-                @Override
-                public void onResponse(@NonNull retrofit2.Call<PokemonResponse> call,
-                                       @NonNull retrofit2.Response<PokemonResponse> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        PokemonResponse data = response.body();
-                        List<String> types = new ArrayList<>();
-                        for (PokemonResponse.TypeSlot slot : data.getTypes())
-                            types.add(slot.getType().getName());
-
-                        String sprite = null;
-                        if (data.getSprites().getOther() != null &&
-                                data.getSprites().getOther().getOfficialArtwork() != null)
-                            sprite = data.getSprites().getOther().getOfficialArtwork().getFrontDefault();
-                        if (sprite == null) sprite = data.getSprites().getFrontDefault();
-
-                        OwnedPokemon owned = new OwnedPokemon(data.getId(), data.getName(), types, rarity, sprite);
-                        gameManager.addToCollection(owned);
-                        drawnList.add(owned);
-                    }
-                    checkDone(pending, drawnList);
-                }
-
-                @Override
-                public void onFailure(@NonNull retrofit2.Call<PokemonResponse> call, @NonNull Throwable t) {
-                    checkDone(pending, drawnList);
-                }
-            });
+            OwnedPokemon owned = createOfflinePokemon(pokemonId, rarity);
+            gameManager.addToCollection(owned);
+            drawnList.add(owned);
         }
+        showCompletedDraw(drawnList);
     }
 
-    private void checkDone(AtomicInteger pending, List<OwnedPokemon> drawnList) {
-        if (pending.decrementAndGet() != 0) return;
+    private void showCompletedDraw(List<OwnedPokemon> drawnList) {
         if (!isAdded()) return;
         requireActivity().runOnUiThread(() -> {
             drawnList.sort((a, b) -> rarityOrder(b.getRarity()) - rarityOrder(a.getRarity()));
@@ -313,6 +279,12 @@ public class DrawFragment extends Fragment {
             }
             updateGenProgressUI();
         });
+    }
+
+    private OwnedPokemon createOfflinePokemon(int pokemonId, String rarity) {
+        String sprite = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/" + pokemonId + ".png";
+        String name = "Pokemon #" + String.format("%03d", pokemonId);
+        return new OwnedPokemon(pokemonId, name, new ArrayList<>(), rarity, sprite);
     }
 
     private void showCardAt(int index) {

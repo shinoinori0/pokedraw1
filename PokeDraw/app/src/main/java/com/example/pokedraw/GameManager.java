@@ -5,9 +5,6 @@ import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 
-import com.example.pokedraw.api.PokeApiService;
-import com.example.pokedraw.api.PokemonResponse;
-import com.example.pokedraw.api.RetrofitClient;
 import com.example.pokedraw.model.OwnedPokemon;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -217,24 +214,11 @@ public class GameManager {
             entry.setDisplayId(displayId);
             entry.setStage(newStage);
             final String oldName = capitalize(entry.getName());
-            final int finalDisplayId = displayId;
-            RetrofitClient.getInstance().getApiService().getPokemon(finalDisplayId)
-                    .enqueue(new retrofit2.Callback<com.example.pokedraw.api.PokemonResponse>() {
-                        @Override
-                        public void onResponse(@NonNull retrofit2.Call<com.example.pokedraw.api.PokemonResponse> call,
-                                               @NonNull retrofit2.Response<com.example.pokedraw.api.PokemonResponse> r) {
-                            if (r.isSuccessful() && r.body() != null) {
-                                entry.setName(r.body().getName());
-                                saveLocalCache();
-                                syncToFirebase(entry);
-                                if (evolutionListener != null)
-                                    evolutionListener.onEvolved(oldName, capitalize(r.body().getName()));
-                            }
-                        }
-                        @Override
-                        public void onFailure(@NonNull retrofit2.Call<com.example.pokedraw.api.PokemonResponse> call,
-                                              @NonNull Throwable t) {}
-                    });
+            entry.setName(defaultPokemonName(displayId));
+            saveLocalCache();
+            syncToFirebase(entry);
+            if (evolutionListener != null)
+                evolutionListener.onEvolved(oldName, capitalize(entry.getName()));
         }
     }
 
@@ -251,30 +235,14 @@ public class GameManager {
         int displayId = entry.getDisplayId() == 0 ? baseId : entry.getDisplayId();
         for (int s = currentStage + 1; s <= targetStage; s++)
             displayId = EvolutionChain.getNextDisplayId(baseId, displayId, s);
+        final String oldName = capitalize(entry.getName());
         entry.setDisplayId(displayId);
         entry.setStage(targetStage);
+        entry.setName(defaultPokemonName(displayId));
         saveLocalCache();
         syncToFirebase(entry);
-        // Fetch the evolved form's name from API and update asynchronously
-        final String oldName = capitalize(entry.getName());
-        final int finalDisplayId = displayId;
-        PokeApiService api = RetrofitClient.getInstance().getApiService();
-        api.getPokemon(finalDisplayId).enqueue(new retrofit2.Callback<PokemonResponse>() {
-            @Override
-            public void onResponse(@androidx.annotation.NonNull retrofit2.Call<PokemonResponse> call,
-                                   @androidx.annotation.NonNull retrofit2.Response<PokemonResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    entry.setName(response.body().getName());
-                    saveLocalCache();
-                    syncToFirebase(entry);
-                    if (evolutionListener != null)
-                        evolutionListener.onEvolved(oldName, capitalize(response.body().getName()));
-                }
-            }
-            @Override
-            public void onFailure(@androidx.annotation.NonNull retrofit2.Call<PokemonResponse> call,
-                                  @androidx.annotation.NonNull Throwable t) {}
-        });
+        if (evolutionListener != null)
+            evolutionListener.onEvolved(oldName, capitalize(entry.getName()));
         return true;
     }
 
@@ -505,6 +473,10 @@ public class GameManager {
             case EvolutionChain.TIER_GOLD:  return "Gold";
             default:                        return "";
         }
+    }
+
+    private static String defaultPokemonName(int id) {
+        return "Pokemon #" + String.format(Locale.US, "%03d", id);
     }
 
     private String uid() {
