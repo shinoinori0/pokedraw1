@@ -17,7 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.bumptech.glide.Glide;
 import com.example.pokedraw.GameManager;
 import com.example.pokedraw.R;
 
@@ -230,32 +229,15 @@ public class GuessingFragment extends Fragment {
         btnChoice2.setOnClickListener(v -> handleGuess(choices.get(1)));
         btnChoice3.setOnClickListener(v -> handleGuess(choices.get(2)));
 
-        // Load silhouette
         progressBar.setVisibility(View.VISIBLE);
-        ivSilhouette.setImageDrawable(null);
-        String url = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/" + correctId + ".png";
-        Glide.with(this)
-                .load(url)
-                .into(new com.bumptech.glide.request.target.SimpleTarget<android.graphics.drawable.Drawable>() {
-                    @Override
-                    public void onResourceReady(@NonNull android.graphics.drawable.Drawable resource,
-                                                @Nullable com.bumptech.glide.request.transition.Transition<? super android.graphics.drawable.Drawable> transition) {
-                        if (!isAdded()) return;
-                        progressBar.setVisibility(View.GONE);
-                        ivSilhouette.setImageDrawable(resource);
-                        // Apply silhouette: greyscale + darken
-                        ColorMatrix cm = new ColorMatrix();
-                        cm.setSaturation(0);
-                        ColorMatrixColorFilter filter = new ColorMatrixColorFilter(cm);
-                        ivSilhouette.setColorFilter(filter);
-                        ivSilhouette.setAlpha(0.15f);
-                    }
-                    @Override
-                    public void onLoadFailed(@Nullable android.graphics.drawable.Drawable errorDrawable) {
-                        if (!isAdded()) return;
-                        progressBar.setVisibility(View.GONE);
-                    }
-                });
+        ivSilhouette.setImageResource(android.R.drawable.sym_def_app_icon);
+        progressBar.setVisibility(View.GONE);
+        // Apply silhouette: greyscale + darken
+        ColorMatrix cm = new ColorMatrix();
+        cm.setSaturation(0);
+        ColorMatrixColorFilter filter = new ColorMatrixColorFilter(cm);
+        ivSilhouette.setColorFilter(filter);
+        ivSilhouette.setAlpha(0.15f);
     }
 
     private void handleGuess(String chosen) {

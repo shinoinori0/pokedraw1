@@ -24,7 +24,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.pokedraw.GameManager;
 import com.example.pokedraw.R;
 import com.example.pokedraw.RarityConfig;
@@ -301,7 +300,7 @@ public class DrawFragment extends Fragment {
         tvSingleRarity.setText(p.getRarity());
         tvSingleRarity.setTextColor(rarityColor(p.getRarity()));
 
-        Glide.with(this).load(p.getSpriteUrl()).into(ivSinglePokemon);
+        ivSinglePokemon.setImageResource(android.R.drawable.sym_def_app_icon);
 
         btnNextCard.setVisibility(View.VISIBLE);
         btnNextCard.setText(index < total - 1 ? "Next" : "Done");

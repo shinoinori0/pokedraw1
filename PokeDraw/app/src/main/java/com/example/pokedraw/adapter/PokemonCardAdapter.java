@@ -16,8 +16,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DecodeFormat;
 import com.example.pokedraw.EvolutionChain;
 import com.example.pokedraw.ParticleView;
 import com.example.pokedraw.PokemonDetailActivity;
@@ -29,8 +27,6 @@ import com.google.android.material.card.MaterialCardView;
 import java.util.List;
 
 public class PokemonCardAdapter extends RecyclerView.Adapter<PokemonCardAdapter.ViewHolder> {
-
-    private static final String SPRITE_BASE = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/";
 
     public interface OnEvolveListener {
         void onEvolve(int baseId, int adapterPosition);
@@ -109,12 +105,8 @@ public class PokemonCardAdapter extends RecyclerView.Adapter<PokemonCardAdapter.
                 h.tvTierBadge.setVisibility(View.GONE);
             }
 
-            // Particles — collection only, tier > 0
-            if (isCollection && tier > 0) {
-                h.particleView.startParticles(tier);
-            } else {
-                h.particleView.stopParticles();
-            }
+            // Mobile-safe mode: disable per-card particles to reduce crashes on low-memory phones.
+            h.particleView.stopParticles();
 
             // Evolve status — collection only, auto-evolve happens via EXP so just show status
             if (isCollection) {
@@ -140,12 +132,7 @@ public class PokemonCardAdapter extends RecyclerView.Adapter<PokemonCardAdapter.
         }
 
         // Sprite — always load normally, overlay handles the unowned visual
-        int displayId = p.getDisplayId() > 0 ? p.getDisplayId() : p.getId();
-        Glide.with(h.itemView.getContext())
-                .load(SPRITE_BASE + displayId + ".png")
-                .format(DecodeFormat.PREFER_RGB_565)
-                .dontAnimate()
-                .into(h.ivPokemon);
+        h.ivPokemon.setImageResource(android.R.drawable.sym_def_app_icon);
         h.ivPokemon.clearColorFilter();
         h.ivPokemon.setAlpha(1f);
 

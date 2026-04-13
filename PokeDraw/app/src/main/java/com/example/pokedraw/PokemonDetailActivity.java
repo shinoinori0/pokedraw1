@@ -11,14 +11,9 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.bumptech.glide.Glide;
-import com.example.pokedraw.api.PokemonResponse;
-import com.example.pokedraw.api.PokemonSpeciesResponse;
-import com.example.pokedraw.api.RetrofitClient;
 import com.example.pokedraw.model.OwnedPokemon;
 
 public class PokemonDetailActivity extends AppCompatActivity {
@@ -54,19 +49,27 @@ public class PokemonDetailActivity extends AppCompatActivity {
 
             if (forcedDisplayId > 0) {
                 // Opened from Pokedex — fetch everything from API for this exact slot id.
-                // Collection is irrelevant here except to know if it's owned.
                 tvId.setText(String.format("#%03d", forcedDisplayId));
-                String spriteUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/" + forcedDisplayId + ".png";
-                Glide.with(this).load(spriteUrl).into(ivPokemon);
+                ivPokemon.setImageResource(android.R.drawable.sym_def_app_icon);
                 if (!owned) {
                     ColorMatrix cm = new ColorMatrix();
                     cm.setSaturation(0);
                     ivPokemon.setColorFilter(new ColorMatrixColorFilter(cm));
                     ivPokemon.setAlpha(0.4f);
                 }
-                fetchStats(forcedDisplayId, llStats);
-                // fetchStats also fills name/types via API callback
-                fetchNameAndTypes(forcedDisplayId, tvName, llTypes, tvRarity, owned ? collection.get(pokemonId) : null);
+                if (owned) {
+                    OwnedPokemon p = collection.get(pokemonId);
+                    tvName.setText(capitalize(p.getName()));
+                    if (getSupportActionBar() != null) getSupportActionBar().setTitle(capitalize(p.getName()));
+                    tvRarity.setText(p.getRarity());
+                    tvRarity.setTextColor(rarityColor(p.getRarity()));
+                    for (String type : p.getTypes()) llTypes.addView(makeTypeChip(type));
+                } else {
+                    tvName.setText("Pokemon #" + String.format("%03d", forcedDisplayId));
+                    tvRarity.setText("Not yet obtained");
+                    tvRarity.setTextColor(Color.GRAY);
+                }
+                llStats.setVisibility(View.GONE);
             } else if (owned) {
                 OwnedPokemon p = collection.get(pokemonId);
                 int displayId  = p.getDisplayId() > 0 ? p.getDisplayId() : pokemonId;
@@ -80,9 +83,8 @@ public class PokemonDetailActivity extends AppCompatActivity {
                 tvRarity.setTextColor(rarityColor(p.getRarity()));
                 for (String type : p.getTypes()) llTypes.addView(makeTypeChip(type));
 
-                String spriteUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/" + displayId + ".png";
-                Glide.with(this).load(spriteUrl).into(ivPokemon);
-                fetchStats(displayId, llStats);
+                ivPokemon.setImageResource(android.R.drawable.sym_def_app_icon);
+                llStats.setVisibility(View.GONE);
             } else {
                 if (getSupportActionBar() != null) getSupportActionBar().setTitle("???");
                 tvId.setText(String.format("#%03d", pokemonId));
@@ -90,76 +92,17 @@ public class PokemonDetailActivity extends AppCompatActivity {
                 tvRarity.setText("Not yet obtained");
                 tvRarity.setTextColor(Color.GRAY);
 
-                String fallbackUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/" + pokemonId + ".png";
-                Glide.with(this).load(fallbackUrl).into(ivPokemon);
+                ivPokemon.setImageResource(android.R.drawable.sym_def_app_icon);
                 ColorMatrix cm = new ColorMatrix();
                 cm.setSaturation(0);
                 ivPokemon.setColorFilter(new ColorMatrixColorFilter(cm));
                 ivPokemon.setAlpha(0.4f);
 
-                fetchStats(pokemonId, llStats);
+                llStats.setVisibility(View.GONE);
             }
 
-            // Flavor text always shown (species uses base form id for accuracy)
-            fetchFlavorText(pokemonId, tvFlavor);
+            tvFlavor.setVisibility(View.GONE);
         }));
-    }
-
-    /** Pokedex-only: fetch name and types from API, never from collection. */
-    private void fetchNameAndTypes(int id, TextView tvName, LinearLayout llTypes,
-                                   TextView tvRarity, OwnedPokemon ownedForRarity) {
-        RetrofitClient.getInstance().getApiService().getPokemon(id)
-                .enqueue(new retrofit2.Callback<PokemonResponse>() {
-                    @Override
-                    public void onResponse(@NonNull retrofit2.Call<PokemonResponse> call,
-                                           @NonNull retrofit2.Response<PokemonResponse> r) {
-                        if (!r.isSuccessful() || r.body() == null) return;
-                        PokemonResponse data = r.body();
-                        runOnUiThread(() -> {
-                            String name = capitalize(data.getName());
-                            tvName.setText(name);
-                            if (getSupportActionBar() != null)
-                                getSupportActionBar().setTitle(name);
-                            llTypes.removeAllViews();
-                            for (PokemonResponse.TypeSlot ts : data.getTypes())
-                                llTypes.addView(makeTypeChip(ts.getType().getName()));
-                            if (ownedForRarity != null) {
-                                tvRarity.setText(ownedForRarity.getRarity());
-                                tvRarity.setTextColor(rarityColor(ownedForRarity.getRarity()));
-                            } else {
-                                tvRarity.setText("Not yet obtained");
-                                tvRarity.setTextColor(android.graphics.Color.GRAY);
-                            }
-                        });
-                    }
-                    @Override
-                    public void onFailure(@NonNull retrofit2.Call<PokemonResponse> call,
-                                         @NonNull Throwable t) {}
-                });
-    }
-
-    private void fetchStats(int id, LinearLayout llStats) {
-        RetrofitClient.getInstance().getApiService().getPokemon(id)
-                .enqueue(new retrofit2.Callback<PokemonResponse>() {
-                    @Override
-                    public void onResponse(@NonNull retrofit2.Call<PokemonResponse> call,
-                                           @NonNull retrofit2.Response<PokemonResponse> r) {
-                        if (!r.isSuccessful() || r.body() == null) return;
-                        PokemonResponse data = r.body();
-                        runOnUiThread(() -> {
-                            bindStat(llStats.findViewById(R.id.statHp),   "HP",      data.getStat("hp"));
-                            bindStat(llStats.findViewById(R.id.statAtk),  "Atk",     data.getStat("attack"));
-                            bindStat(llStats.findViewById(R.id.statDef),  "Def",     data.getStat("defense"));
-                            bindStat(llStats.findViewById(R.id.statSpAtk),"Sp.Atk",  data.getStat("special-attack"));
-                            bindStat(llStats.findViewById(R.id.statSpDef),"Sp.Def",  data.getStat("special-defense"));
-                            bindStat(llStats.findViewById(R.id.statSpd),  "Speed",   data.getStat("speed"));
-                            llStats.setVisibility(View.VISIBLE);
-                        });
-                    }
-                    @Override
-                    public void onFailure(@NonNull retrofit2.Call<PokemonResponse> call,
-                                         @NonNull Throwable t) {}
-                });
     }
 
     private void bindStat(View row, String label, int value) {
@@ -177,26 +120,6 @@ public class PokemonDetailActivity extends AppCompatActivity {
         return Color.parseColor("#FF5252");                    // red
     }
 
-    private void fetchFlavorText(int id, TextView tvFlavor) {
-        RetrofitClient.getInstance().getApiService().getPokemonSpecies(id)
-                .enqueue(new retrofit2.Callback<PokemonSpeciesResponse>() {
-                    @Override
-                    public void onResponse(@NonNull retrofit2.Call<PokemonSpeciesResponse> call,
-                                           @NonNull retrofit2.Response<PokemonSpeciesResponse> r) {
-                        if (!r.isSuccessful() || r.body() == null) return;
-                        String text = r.body().getEnglishFlavorText();
-                        if (!text.isEmpty()) {
-                            runOnUiThread(() -> {
-                                tvFlavor.setText(text);
-                                tvFlavor.setVisibility(View.VISIBLE);
-                            });
-                        }
-                    }
-                    @Override
-                    public void onFailure(@NonNull retrofit2.Call<PokemonSpeciesResponse> call,
-                                         @NonNull Throwable t) {}
-                });
-    }
 
     private TextView makeTypeChip(String type) {
         TextView tv = new TextView(this);
