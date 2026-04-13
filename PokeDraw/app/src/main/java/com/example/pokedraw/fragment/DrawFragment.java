@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pokedraw.GameManager;
+import com.example.pokedraw.PokemonDexCache;
 import com.example.pokedraw.R;
 import com.example.pokedraw.RarityConfig;
 import com.example.pokedraw.adapter.PokemonCardAdapter;
@@ -281,8 +282,8 @@ public class DrawFragment extends Fragment {
     }
 
     private OwnedPokemon createOfflinePokemon(int pokemonId, String rarity) {
-        String sprite = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/" + pokemonId + ".png";
-        String name = "Pokemon #" + String.format("%03d", pokemonId);
+        String sprite = "";
+        String name = PokemonDexCache.getName(requireContext(), pokemonId);
         return new OwnedPokemon(pokemonId, name, new ArrayList<>(), rarity, sprite);
     }
 

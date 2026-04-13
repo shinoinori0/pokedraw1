@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        PokemonDexCache.warmUpIfNeeded(this);
 
         GameManager.getInstance(this).setEvolutionListener((from, to) ->
             mainHandler.post(() -> enqueueEvolution(from, to)));

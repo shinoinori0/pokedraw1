@@ -38,6 +38,7 @@ public class GameManager {
     public  static final String KEY_AUTO_DRAW      = "auto_draw";
     public  static final String KEY_ONBOARDING_DONE = "onboarding_done";
     private static final String KEY_REDEEMED_DRAWS = "redeemed_draws"; // never day-reset
+    private static final String KEY_ACTIVE_UID = "active_uid";
     private static final int    MAX_DRAWS          = 3;
     private static final int    MAX_GUESSES        = 5;
 
@@ -79,7 +80,7 @@ public class GameManager {
     // ── Local cache ────────────────────────────────────────────────────────────
 
     private void loadLocalCache() {
-        String json = prefs.getString(KEY_COLLECTION, null);
+        String json = prefs.getString(scopedKey(KEY_COLLECTION), null);
         if (json != null) {
             Type type = new TypeToken<List<OwnedPokemon>>() {}.getType();
             List<OwnedPokemon> list = gson.fromJson(json, type);
@@ -94,7 +95,7 @@ public class GameManager {
 
     private void saveLocalCache() {
         List<OwnedPokemon> list = new ArrayList<>(localCollection.values());
-        prefs.edit().putString(KEY_COLLECTION, gson.toJson(list)).apply();
+        prefs.edit().putString(scopedKey(KEY_COLLECTION), gson.toJson(list)).apply();
     }
 
     // ── Firebase ───────────────────────────────────────────────────────────────
@@ -122,6 +123,8 @@ public class GameManager {
     }
 
     public void onUserLoggedIn() {
+        String currentUid = uid();
+        if (currentUid != null) prefs.edit().putString(KEY_ACTIVE_UID, currentUid).apply();
         collectionLoaded = false;
         localCollection.clear();
         pendingCallbacks.clear();
@@ -151,9 +154,7 @@ public class GameManager {
         if (entry == null) {
             // First time — if we drew a higher stage, show that form immediately, not the base
             int drawnStage = EvolutionChain.getDrawStage(drawn.getId());
-            String sprite  = drawn.getId() == baseId
-                    ? drawn.getSpriteUrl()
-                    : "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/" + drawn.getId() + ".png";
+            String sprite  = drawn.getId() == baseId ? drawn.getSpriteUrl() : "";
             entry = new OwnedPokemon(baseId, drawn.getName(), drawn.getTypes(), drawn.getRarity(), sprite);
             entry.setDisplayId(drawn.getId());
             entry.setStage(drawnStage);
@@ -249,7 +250,7 @@ public class GameManager {
     /** Creates a brand-new independent entry for a spawned Pokémon (eeveelution / hitmon). */
     private void spawnEntry(int spawnId, OwnedPokemon spawner) {
         // Inherit rarity from spawner; sprite URL uses standard PokeAPI pattern
-        String spriteUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/" + spawnId + ".png";
+        String spriteUrl = "";
         OwnedPokemon spawn = new OwnedPokemon(spawnId, "", spawner.getTypes(), spawner.getRarity(), spriteUrl);
         spawn.setDisplayId(spawnId);
         spawn.setStage(1);
@@ -270,7 +271,13 @@ public class GameManager {
     public void clearAllData() {
         boolean oneAtATime = prefs.getBoolean(KEY_DRAW_MODE_ONE, true);
         boolean bgmMuted   = prefs.getBoolean(KEY_BGM_MUTED, false);
-        prefs.edit().clear()
+        prefs.edit()
+                .remove(scopedKey(KEY_DRAW_DATE))
+                .remove(scopedKey(KEY_DRAW_COUNT))
+                .remove(scopedKey(KEY_BONUS_DRAWS))
+                .remove(scopedKey(KEY_GUESS_COUNT))
+                .remove(scopedKey(KEY_COLLECTION))
+                .remove(scopedKey(KEY_REDEEMED_DRAWS))
                 .putBoolean(KEY_DRAW_MODE_ONE, oneAtATime)
                 .putBoolean(KEY_BGM_MUTED, bgmMuted)
                 .apply();
@@ -283,9 +290,9 @@ public class GameManager {
 
     public int getDrawsRemaining() {
         resetIfNewDay();
-        int used     = prefs.getInt(KEY_DRAW_COUNT, 0);
-        int bonus    = prefs.getInt(KEY_BONUS_DRAWS, 0);
-        int redeemed = prefs.getInt(KEY_REDEEMED_DRAWS, 0);
+        int used     = prefs.getInt(scopedKey(KEY_DRAW_COUNT), 0);
+        int bonus    = prefs.getInt(scopedKey(KEY_BONUS_DRAWS), 0);
+        int redeemed = prefs.getInt(scopedKey(KEY_REDEEMED_DRAWS), 0);
         return Math.max(0, MAX_DRAWS + bonus - used) + redeemed;
     }
 
@@ -294,17 +301,17 @@ public class GameManager {
     public void recordDraw() {
         resetIfNewDay();
         // Drain redeemed pool first before consuming daily draws
-        int redeemed = prefs.getInt(KEY_REDEEMED_DRAWS, 0);
+        int redeemed = prefs.getInt(scopedKey(KEY_REDEEMED_DRAWS), 0);
         if (redeemed > 0) {
-            prefs.edit().putInt(KEY_REDEEMED_DRAWS, redeemed - 1).apply();
+            prefs.edit().putInt(scopedKey(KEY_REDEEMED_DRAWS), redeemed - 1).apply();
         } else {
-            prefs.edit().putInt(KEY_DRAW_COUNT, prefs.getInt(KEY_DRAW_COUNT, 0) + 1).apply();
+            prefs.edit().putInt(scopedKey(KEY_DRAW_COUNT), prefs.getInt(scopedKey(KEY_DRAW_COUNT), 0) + 1).apply();
         }
     }
 
     public void addBonusDraw() {
         resetIfNewDay();
-        prefs.edit().putInt(KEY_BONUS_DRAWS, prefs.getInt(KEY_BONUS_DRAWS, 0) + 1).apply();
+        prefs.edit().putInt(scopedKey(KEY_BONUS_DRAWS), prefs.getInt(scopedKey(KEY_BONUS_DRAWS), 0) + 1).apply();
     }
 
     /** Redeem a code. Returns true if valid, false if unrecognised. No use limit. */
@@ -313,8 +320,8 @@ public class GameManager {
             case "pokedraw666":
             case "pokedraw777":
             case "pokedraw999":
-                int current = prefs.getInt(KEY_REDEEMED_DRAWS, 0);
-                prefs.edit().putInt(KEY_REDEEMED_DRAWS, current + 500).apply();
+                int current = prefs.getInt(scopedKey(KEY_REDEEMED_DRAWS), 0);
+                prefs.edit().putInt(scopedKey(KEY_REDEEMED_DRAWS), current + 500).apply();
                 return true;
             default:
                 return false;
@@ -325,14 +332,14 @@ public class GameManager {
 
     public int getGuessesRemaining() {
         resetIfNewDay();
-        return MAX_GUESSES - prefs.getInt(KEY_GUESS_COUNT, 0);
+        return MAX_GUESSES - prefs.getInt(scopedKey(KEY_GUESS_COUNT), 0);
     }
 
     public boolean canGuess() { return getGuessesRemaining() > 0; }
 
     public void recordGuess() {
         resetIfNewDay();
-        prefs.edit().putInt(KEY_GUESS_COUNT, prefs.getInt(KEY_GUESS_COUNT, 0) + 1).apply();
+        prefs.edit().putInt(scopedKey(KEY_GUESS_COUNT), prefs.getInt(scopedKey(KEY_GUESS_COUNT), 0) + 1).apply();
     }
 
     // ── Draw mode preference ───────────────────────────────────────────────────
@@ -364,12 +371,12 @@ public class GameManager {
 
     private void resetIfNewDay() {
         String today = today();
-        if (!today.equals(prefs.getString(KEY_DRAW_DATE, ""))) {
+        if (!today.equals(prefs.getString(scopedKey(KEY_DRAW_DATE), ""))) {
             prefs.edit()
-                    .putString(KEY_DRAW_DATE, today)
-                    .putInt(KEY_DRAW_COUNT, 0)
-                    .putInt(KEY_BONUS_DRAWS, 0)
-                    .putInt(KEY_GUESS_COUNT, 0)
+                    .putString(scopedKey(KEY_DRAW_DATE), today)
+                    .putInt(scopedKey(KEY_DRAW_COUNT), 0)
+                    .putInt(scopedKey(KEY_BONUS_DRAWS), 0)
+                    .putInt(scopedKey(KEY_GUESS_COUNT), 0)
                     .apply();
         }
     }
@@ -482,5 +489,11 @@ public class GameManager {
     private String uid() {
         if (FirebaseAuth.getInstance().getCurrentUser() == null) return null;
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
+    }
+
+    private String scopedKey(String key) {
+        String userId = uid();
+        if (userId == null || userId.isEmpty()) return "guest_" + key;
+        return userId + "_" + key;
     }
 }

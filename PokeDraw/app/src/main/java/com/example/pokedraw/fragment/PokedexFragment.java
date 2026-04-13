@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pokedraw.GameManager;
+import com.example.pokedraw.PokemonDexCache;
 import com.example.pokedraw.R;
 import com.example.pokedraw.RarityConfig;
 import com.example.pokedraw.adapter.PokemonCardAdapter;
@@ -108,10 +109,10 @@ public class PokedexFragment extends Fragment {
         for (int id = 1; id <= TOTAL; id++) {
             OwnedPokemon p = new OwnedPokemon();
             p.setId(id);
-            p.setName("???");
+            p.setName(PokemonDexCache.getName(requireContext(), id));
             p.setTypes(new ArrayList<>());
             p.setRarity("???");
-            p.setSpriteUrl("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/" + id + ".png");
+            p.setSpriteUrl("");
             p.setDisplayId(id);
             p.setCount(0);
             fullList.add(p);
