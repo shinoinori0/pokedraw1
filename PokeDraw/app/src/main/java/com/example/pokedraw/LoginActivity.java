@@ -24,6 +24,7 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         if (mAuth.getCurrentUser() != null) {
+            GameManager.getInstance(this).onUserLoggedIn();
             goToMain();
             return;
         }

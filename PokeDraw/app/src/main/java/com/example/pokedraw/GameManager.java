@@ -65,6 +65,7 @@ public class GameManager {
     private boolean collectionLoaded = false;
     private final List<CollectionCallback> pendingCallbacks = new ArrayList<>();
     private DatabaseReference collectionRef;
+    private ValueEventListener collectionListener;
 
     private GameManager(Context context) {
         prefs = context.getApplicationContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -103,11 +104,12 @@ public class GameManager {
     // ── Firebase ───────────────────────────────────────────────────────────────
 
     private void attachListener() {
+        detachListener();
         String uid = uid();
         if (uid == null) return;
         collectionRef = FirebaseDatabase.getInstance()
                 .getReference("users").child(uid).child("collection");
-        collectionRef.addValueEventListener(new ValueEventListener() {
+        collectionListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 localCollection.clear();
@@ -121,17 +123,34 @@ public class GameManager {
                 pendingCallbacks.clear();
             }
             @Override public void onCancelled(@NonNull DatabaseError error) {}
-        });
+        };
+        collectionRef.addValueEventListener(collectionListener);
+    }
+
+    private void detachListener() {
+        if (collectionRef != null && collectionListener != null) {
+            collectionRef.removeEventListener(collectionListener);
+        }
+        collectionListener = null;
+        collectionRef = null;
     }
 
     public void onUserLoggedIn() {
         String currentUid = uid();
         if (currentUid != null) prefs.edit().putString(KEY_ACTIVE_UID, currentUid).apply();
+        detachListener();
         collectionLoaded = false;
         localCollection.clear();
         pendingCallbacks.clear();
         loadLocalCache();
         attachListener();
+    }
+
+    public void onUserLoggedOut() {
+        detachListener();
+        collectionLoaded = false;
+        localCollection.clear();
+        pendingCallbacks.clear();
     }
 
     // ── Collection access ──────────────────────────────────────────────────────

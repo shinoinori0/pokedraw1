@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
         dialogView.findViewById(R.id.rowLogout).setOnClickListener(v -> {
             dialog.dismiss();
             FirebaseAuth.getInstance().signOut();
-            GameManager.getInstance(this).onUserLoggedIn(); // reset local state
+            GameManager.getInstance(this).onUserLoggedOut();
             Intent intent = new Intent(this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
