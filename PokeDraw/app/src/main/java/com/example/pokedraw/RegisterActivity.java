@@ -63,6 +63,12 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister.setEnabled(false);
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnSuccessListener(r -> {
+                    if (mAuth.getCurrentUser() != null) {
+                        FirebaseUserBootstrap.ensureUserNode(
+                                mAuth.getCurrentUser().getUid(),
+                                mAuth.getCurrentUser().getEmail() != null ? mAuth.getCurrentUser().getEmail() : email
+                        );
+                    }
                     GameManager.getInstance(this).onUserLoggedIn();
                     Toast.makeText(this, "Account created!", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(this, MainActivity.class));

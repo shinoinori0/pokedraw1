@@ -69,6 +69,12 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setEnabled(false);
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnSuccessListener(r -> {
+                    if (mAuth.getCurrentUser() != null) {
+                        FirebaseUserBootstrap.ensureUserNode(
+                                mAuth.getCurrentUser().getUid(),
+                                mAuth.getCurrentUser().getEmail() != null ? mAuth.getCurrentUser().getEmail() : email
+                        );
+                    }
                     GameManager.getInstance(this).onUserLoggedIn();
                     goToMain();
                 })
