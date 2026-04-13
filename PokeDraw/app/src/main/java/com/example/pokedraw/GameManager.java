@@ -60,6 +60,8 @@ public class GameManager {
     private EvolutionListener evolutionListener;
 
     private final Map<Integer, OwnedPokemon> localCollection = new HashMap<>();
+    private final Map<Integer, OwnedPokemon> pendingSyncEntries = new HashMap<>();
+    private boolean bulkUpdate = false;
     private boolean collectionLoaded = false;
     private final List<CollectionCallback> pendingCallbacks = new ArrayList<>();
     private DatabaseReference collectionRef;
@@ -165,7 +167,7 @@ public class GameManager {
 
         addExpToEntry(entry, expGain);
         saveLocalCache();
-        syncToFirebase(entry);
+        syncEntry(entry);
     }
 
     /**
@@ -258,12 +260,32 @@ public class GameManager {
         spawn.setExp(0);
         spawn.setCount(1);
         localCollection.put(spawnId, spawn);
-        syncToFirebase(spawn);
+        syncEntry(spawn);
+    }
+
+    private void syncEntry(OwnedPokemon entry) {
+        if (bulkUpdate) {
+            pendingSyncEntries.put(entry.getId(), entry);
+            return;
+        }
+        syncToFirebase(entry);
     }
 
     private void syncToFirebase(OwnedPokemon entry) {
         if (collectionRef != null)
             collectionRef.child(String.valueOf(entry.getId())).setValue(entry);
+    }
+
+    public void beginBulkUpdate() {
+        bulkUpdate = true;
+        pendingSyncEntries.clear();
+    }
+
+    public void endBulkUpdate() {
+        bulkUpdate = false;
+        if (pendingSyncEntries.isEmpty()) return;
+        for (OwnedPokemon entry : pendingSyncEntries.values()) syncToFirebase(entry);
+        pendingSyncEntries.clear();
     }
 
     // ── Clear all data ─────────────────────────────────────────────────────────

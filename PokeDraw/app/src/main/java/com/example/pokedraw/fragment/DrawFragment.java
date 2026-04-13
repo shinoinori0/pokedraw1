@@ -246,6 +246,7 @@ public class DrawFragment extends Fragment {
         updateDrawDisplay();
 
         List<OwnedPokemon> drawnList = new ArrayList<>();
+        gameManager.beginBulkUpdate();
         for (int[] roll : rolls) {
             int pokemonId = roll[0];
             String rarity = GameManager.ordinalToRarity(roll[1]);
@@ -253,6 +254,7 @@ public class DrawFragment extends Fragment {
             gameManager.addToCollection(owned);
             drawnList.add(owned);
         }
+        gameManager.endBulkUpdate();
         showCompletedDraw(drawnList);
     }
 
